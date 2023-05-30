@@ -2,6 +2,19 @@ import streamlit as st
 import pandas as pd
 import copy
 
+st.sidebar.title("Gauss")
+
+rows = st.sidebar.number_input("Número de linhas da matriz", min_value=2, value=3)
+cols = rows
+
+st.write(f"Número de linhas e colunas selecionadas: {rows}")
+
+
+data = [[st.sidebar.number_input(f"Valor [{i+1},{j+1}]", key=f"value_{i}_{j}", value=0, min_value= 0, max_value = 100) for j in range(cols)] for i in range(rows)]
+df = pd.DataFrame(data, index=range(1, rows + 1), columns=range(1, cols + 1))
+edited_df = st.experimental_data_editor(df)
+
+
 
 def gauss(entrada):
     def triangular(entrada):
@@ -37,11 +50,12 @@ calculo = [[2, 7, 6, 8, 9, 8],
            [0, -3, 0.5, 0, -9, 8], 
            [0, -2, 9, 3, 8, 8]]
 
+
 st.write("Matriz Antes do Calculo")
 data = calculo
 df = pd.DataFrame(data)
 
-st.dataframe(df)
+edited_df = st.experimental_data_editor(df)
 
 
 
