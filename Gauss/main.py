@@ -1,48 +1,46 @@
-import copy
-import pandas as pd
+import streamlit as st
+from gauss import gauss
+from gaussseidel import seidel
+
+def main():
+    st.title("Resolução de Sistemas Lineares")
+    st.header("Método de Gauss-Seidel e Eliminação de Gauss")
+
+    st.subheader("Entrada")
+    st.write("Digite a matriz A:")
+    A = create_matrix_input("A", [[5, 1, 1], [3, 4, 1], [3, 3, 6]])
+    st.write("Digite o vetor b:")
+    b = create_vector_input("b", [5, 6, 0])
+    epsilon = st.number_input("Epsilon", value=0.05, step=0.01)
+
+    st.subheader("Resultado")
+    if st.button("Resolver usando Gauss-Seidel"):
+        result_gs = seidel(A, b, epsilon)
+        st.write("Resultado usando Gauss-Seidel:")
+        st.write(result_gs)
+
+    if st.button("Resolver usando Eliminação de Gauss"):
+        result_gauss = gauss(A, b)
+        st.write("Resultado usando Eliminação de Gauss:")
+        st.write(result_gauss)
+
+def create_matrix_input(name, default_value):
+    matrix = []
+    for i, row in enumerate(default_value):
+        matrix_row = []
+        for j, value in enumerate(row):
+            value = st.number_input(f"{name}[{i}][{j}]", value=value)
+            matrix_row.append(value)
+        matrix.append(matrix_row)
+    return matrix
+
+def create_vector_input(name, default_value):
+    vector = []
+    for i, value in enumerate(default_value):
+        value = st.number_input(f"{name}[{i}]", value=value)
+        vector.append(value)
+    return vector
 
 
-def triangular(entrada):
-	saida = [None for x in range(len(entrada))]
-	for i in reversed(range(0,len(entrada[0])-1)):
-		soma = 0
-		for j in reversed(range(i,len(entrada))):
-			if i != j: 
-				soma += saida[j]*entrada[i][j] 
-			else: 
-				saida[i]=(entrada[i][len(entrada[0])-1]-soma)/entrada[i][i] 
-				break
-	return saida
-
-def escalonamento(entrada):
-    n = len(entrada)
-    anterior = copy.deepcopy(entrada)
-    proximo = copy.deepcopy(entrada)
-    iterations = []
-    iterations.append(anterior)  # Armazena a matriz original como a primeira iteração
-    for k in range(1, n):
-        if proximo[k][k] == 0:
-            return None
-        anterior = copy.deepcopy(proximo)
-        for i in range(n):
-            for j in range(n+1):
-                if i < k:
-                    proximo[i][j] = anterior[i][j]
-                elif i > k-1 and j < k:
-                    proximo[i][j] = 0
-                else:
-                    proximo[i][j] = anterior[i][j] - (anterior[i][k-1] / anterior[k-1][k-1] * anterior[k-1][j])
-        iterations.append(copy.deepcopy(proximo))  # Armazena cada iteração
-    return iterations
-
-def gauss(entrada):
-    return triangular(escalonamento(entrada))
-
-entrada = [[2, 0, 0, 0, 3], [1, 1.5, 0, 0, 4.5], [0, -3, 0.5, 0, -6.6], [2, -2, 1, 1, 0.8]]
-iterations = gauss(entrada)
-
-for i, iteration in enumerate(iterations):
-    df = pd.DataFrame(iteration)
-    print(f"Iteração {i+1}")
-    print(df)
-    print()
+if __name__ == "__main__":
+    main()
